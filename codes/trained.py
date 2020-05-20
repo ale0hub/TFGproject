@@ -6,9 +6,9 @@ Created on Wed Apr 29 23:34:37 2020
 """
 from magenta.music import midi_io as mmm
 
-from magenta.models.music_vae import trained_model as tm
+import trained_model as tm
 
-from magenta.models.music_vae import TrainedModel, configs
+import TrainedModel, configs
 
 import numpy
 

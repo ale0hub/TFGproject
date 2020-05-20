@@ -20,7 +20,7 @@ from __future__ import print_function
 
 import abc
 
-from magenta.models.music_vae.myfiles import data
+import data
 import magenta.music as mm
 from magenta.music import chords_lib
 from magenta.music import performance_lib

@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from magenta.models.music_vae.myfiles import lstm_utils
+import lstm_utils
 import numpy as np
 import tensorflow as tf
 from tensorflow.contrib import rnn

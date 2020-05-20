@@ -20,7 +20,7 @@ from __future__ import print_function
 
 import copy
 
-from magenta.models.music_vae.myfiles import data_hierarchical
+import data_hierarchical
 import magenta.music as mm
 from magenta.music import testing_lib
 from magenta.music.protobuf import music_pb2

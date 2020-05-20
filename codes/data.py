@@ -1339,7 +1339,7 @@ class GrooveConverter(BaseNoteSequenceConverter):
                add_instruments=None, num_velocity_bins=None,
                num_offset_bins=None, split_instruments=False, hop_size=None,
                hits_as_controls=False, fixed_velocities=False,
-               max_note_dropout_probability=None):
+               fixed_offsets=False, max_note_dropout_probability=None):
 
     self._split_bars = split_bars
     self._steps_per_quarter = steps_per_quarter
@@ -1349,6 +1349,7 @@ class GrooveConverter(BaseNoteSequenceConverter):
     self._tapify = tapify
     self._add_instruments = add_instruments
     self._fixed_velocities = fixed_velocities
+    self._fixed_offsets = fixed_offsets
 
     self._num_velocity_bins = num_velocity_bins
     self._num_offset_bins = num_offset_bins
@@ -1612,6 +1613,9 @@ class GrooveConverter(BaseNoteSequenceConverter):
 
     if self._fixed_velocities:
       in_velocities[:] = 0
+      
+    if self._fixed_offsets:
+      in_offsets[:] = 0
 
     # If learning to add drums, remove the specified drums from the inputs.
     if self._add_instruments:

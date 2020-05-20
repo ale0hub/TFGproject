@@ -19,12 +19,11 @@ from __future__ import division
 from __future__ import print_function
 
 import collections
-
 from magenta.common import merge_hparams
-from magenta.models.music_vae.myfiles import data
-from magenta.models.music_vae.myfiles import data_hierarchical
-from magenta.models.music_vae.myfiles import lstm_models
-from magenta.models.music_vae.myfiles.base_model import MusicVAE
+import data
+import data_hierarchical
+import lstm_models
+from base_model import MusicVAE
 import magenta.music as mm
 from tensorflow.contrib.training import HParams
 
@@ -68,8 +67,8 @@ CONFIG_MAP['groovae_2bar_tap_fixed_velocity'] = Config(
     note_sequence_augmenter=None,
     data_converter=data.GrooveConverter(
         split_bars=2, steps_per_quarter=4, quarters_per_bar=4,
-        max_tensors_per_notesequence=20, tapify=True, fixed_velocities=True,
-        pitch_classes=data.ROLAND_DRUM_PITCH_CLASSES,
+        max_tensors_per_notesequence=20, tapify=True,fixed_offsets=False
+        fixed_velocities=True, pitch_classes=data.ROLAND_DRUM_PITCH_CLASSES,
         inference_pitch_classes=data.REDUCED_DRUM_PITCH_CLASSES),
     tfds_name='groove/2bar-midionly'
 )

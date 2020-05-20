@@ -20,7 +20,7 @@ from __future__ import print_function
 
 import functools
 
-from magenta.models.music_vae.myfiles import data
+import data
 import magenta.music as mm
 from magenta.music import constants
 from magenta.music import testing_lib

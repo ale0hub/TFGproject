@@ -22,8 +22,8 @@ import abc
 
 from magenta.common import flatten_maybe_padded_sequences
 from magenta.common import Nade
-from magenta.models.music_vae.myfiles import base_model
-from magenta.models.music_vae.myfiles import lstm_utils
+import base_model
+import lstm_utils
 import numpy as np
 import tensorflow as tf
 import tensorflow_probability as tfp
