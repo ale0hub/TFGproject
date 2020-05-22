@@ -67,7 +67,7 @@ CONFIG_MAP['groovae_2bar_tap_fixed_velocity'] = Config(
     note_sequence_augmenter=None,
     data_converter=data.GrooveConverter(
         split_bars=2, steps_per_quarter=4, quarters_per_bar=4,
-        max_tensors_per_notesequence=20, tapify=True,fixed_offsets=False
+        max_tensors_per_notesequence=20, tapify=True,fixed_offsets=False,
         fixed_velocities=True, pitch_classes=data.ROLAND_DRUM_PITCH_CLASSES,
         inference_pitch_classes=data.REDUCED_DRUM_PITCH_CLASSES),
     tfds_name='groove/2bar-midionly'
