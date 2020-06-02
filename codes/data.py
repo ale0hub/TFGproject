@@ -63,9 +63,11 @@ ROLAND_DRUM_PITCH_CLASSES = [
     # kick drum
     [36],
     # snare drum
-    [38, 37, 40],
+    #[38, 37, 40],
+    [38, 37, 40, 39],
     # closed hi-hat
-    [42, 22, 44],
+    #[42, 22, 44],
+    [42, 22, 44, 54],
     # open hi-hat
     [46, 26],
     # low tom
@@ -77,7 +79,8 @@ ROLAND_DRUM_PITCH_CLASSES = [
     # crash cymbal
     [49, 52, 55, 57],
     # ride cymbal
-    [51, 53, 59]
+    #[51, 53, 59]
+    [51, 53, 59, 56]
 ]
 
 OUTPUT_VELOCITY = 80
