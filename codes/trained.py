@@ -6,9 +6,11 @@ Created on Wed Apr 29 23:34:37 2020
 """
 from magenta.music import midi_io as mmm
 
+from magenta.music import note_sequence_io as ntsqio
+
 import trained_model as tm
 
-import TrainedModel, configs
+import trained_model, configs, data, music_vae_train
 
 import numpy
 
@@ -16,6 +18,19 @@ import os
 
 import tensorflow as tf
 from six.moves import urllib
+
+from tensorflow.contrib.training import HParams
+
+from magenta.common import merge_hparams
+
+#TFRECORD_PATH = "C:\\Users\\okeyr\\Documents\\tf_records\\egmd1"
+TFRECORD_PATH = "C:\\Users\\okeyr\\Documents\\tf_records\\egmd1_splits\\eval.tfrecord"
+
+NOTEBOOKS_PATH = "C:\\Users\\okeyr\\Documents\\notebooks"
+
+OUTPUT_PATH = "C:\\Users\\okeyr\\Documents\\tap2drum_outputs"
+
+BATCH_SIZE = 2048
 
 # Params: directory (string): parent directory where midi files are located
 # Return: midi files path (list string)
@@ -123,7 +138,7 @@ def get_model(name: str):
   """
   checkpoint = name + ".tar"
   download_checkpoint("music_vae", checkpoint, "checkpoints")
-  return TrainedModel(
+  return trained_model.TrainedModel(
     # Removes the .lohl in some training checkpoint which shares the same config
     configs.CONFIG_MAP[name.split(".")[0] if "." in name else name],
     # The batch size changes the number of sequences to be processed together,
@@ -131,22 +146,105 @@ def get_model(name: str):
     batch_size=1020,
     checkpoint_dir_or_path=os.path.join("checkpoints", checkpoint))
 
+config_file = configs.CONFIG_MAP['groovae_2bar_tap_fixed_velocity']
 
+config_update_map = {}
 
-sequences = get_note_sequences_from_midi_files(get_midi_files_from_directory(os.path.abspath(os.getcwd())+'/groove/drummer1/session3'))
+config_update_map['eval_examples_path'] = TFRECORD_PATH
 
-trainedModel = TrainedModel(configs.CONFIG_MAP['groovae_2bar_tap_fixed_velocity'],1,os.path.join("notebooks", "train", "taptest8"))
+config_update_map['hparams'] = merge_hparams(config_file.hparams,
+                                             HParams(batch_size=BATCH_SIZE))
+
+config_file = configs.update_config(config_file, config_update_map)
+
+dataset = data.get_dataset(
+    config_file)
+
+input_tensors = music_vae_train._get_input_tensors(dataset, config_file)
+
+#sequences = get_note_sequences_from_midi_files(get_midi_files_from_directory(os.path.abspath(os.getcwd())+'/groove/drummer1/session3'))
+
+# inputs = get_collection_from_converter_tensors(converter_tensors)
+
+checkpoints_path = os.path.join(NOTEBOOKS_PATH,"egmd_splits","rate_0.003_batch_2048","train") 
+
+trainedModel = trained_model.TrainedModel(config_file,90,checkpoints_path)
+
+#tensors = get_converter_tensors_from_note_sequences(trainedModel._config.data_converter,sequences)
+
+#inputs = get_collection_from_converter_tensors(tensors)
+
+#☺seq_len = [len(inputs[0])]*len(inputs)
+
+iterator = ntsqio.note_sequence_record_iterator(TFRECORD_PATH)
+
+sequences = list()
+
+for i in range(30):
+        if i <20:
+            next(iterator)
+        else:
+            sequences.append(next(iterator))
 
 tensors = get_converter_tensors_from_note_sequences(trainedModel._config.data_converter,sequences)
 
-inputs = get_collection_from_converter_tensors(tensors)
+inputs_tensors = get_collection_from_converter_tensors(tensors)
 
-seq_len = [len(inputs[0])]*len(inputs)
+print("Inputs created")
 
-latentSpace = trainedModel.encode_tensors(inputs,seq_len)
+outputs_tensors = get_collection_from_converter_tensors(tensors,1)
 
-outputSequences = trainedModel.decode(latentSpace[0],32)
+outputs = trainedModel._config.data_converter._to_notesequences(outputs_tensors)
 
-for seq,i in zip(outputSequences, range(len(outputSequences))):
-    mmm.note_sequence_to_midi_file(sequence=seq, output_file=os.path.abspath(os.getcwd())+'/exportedMidi/example_'+str(i)+'.mid')
+print("Outputs created")
 
+controls = get_collection_from_converter_tensors(tensors,2)
+
+print("Controls created")
+
+length = get_collection_from_converter_tensors(tensors,3)
+
+print("Length created")
+
+#latentSpace = trainedModel.encode_tensors(inputs)
+
+# outputs = outputs[:100]
+
+# inputs = inputs[:100]
+
+# length = length[:100]
+
+# controls = controls[:100]
+
+latentSpace = trainedModel.encode_tensors(inputs_tensors,
+                                           length,
+                                           controls) 
+
+for inpt in inputs_tensors:
+    for i in range(31):
+        if inpt[i][3]==1:
+            inpt[i][12]=1
+
+inputs = trainedModel._config.data_converter._to_notesequences(inputs_tensors)  
+          
+print("Latent space created: ENCODE")
+
+genOutput = trainedModel.decode(latentSpace[0],32)
+
+# for seq,i in zip(outputSequences, range(len(outputSequences))):
+#     mmm.note_sequence_to_midi_file(sequence=seq, output_file=os.path.join(OUTPUT_PATH,"eval_try_3","expected_outputs")+'\example_'+str(i)+'.mid')
+
+# for seq2,j in zip(outputs, range(len(outputs))):
+#     mmm.note_sequence_to_midi_file(sequence=seq2, output_file=os.path.join(OUTPUT_PATH,"eval_try_3","original_outputs")+'\example_'+str(j)+'.mid')
+
+for seq1,j in zip(sequences, range(len(sequences))):
+    mmm.note_sequence_to_midi_file(sequence=seq1, output_file=os.path.join(OUTPUT_PATH,"final_evaluation_3")+'\_'+str(j)+'_real_output.mid')
+    
+for seq2,j in zip(inputs, range(len(inputs))):
+    mmm.note_sequence_to_midi_file(sequence=seq2, output_file=os.path.join(OUTPUT_PATH,"final_evaluation_3")+'\_'+str(j)+'_model_input.mid')
+ 
+for seq3,j in zip(outputs, range(len(outputs))):
+    mmm.note_sequence_to_midi_file(sequence=seq3, output_file=os.path.join(OUTPUT_PATH,"final_evaluation_3")+'\_'+str(j)+'_model_output.mid')
+
+for seq4,j in zip(genOutput, range(len(genOutput))):
+    mmm.note_sequence_to_midi_file(sequence=seq4, output_file=os.path.join(OUTPUT_PATH,"final_evaluation_3")+'\_'+str(j)+'_generated_output.mid')

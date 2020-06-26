@@ -1,4 +1,4 @@
-# Copyright 2019 The Magenta Authors.
+ # Copyright 2019 The Magenta Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -216,19 +216,20 @@ class TrainedModel(object):
     for note_sequence in note_sequences:
       extracted_tensors = self._config.data_converter.to_tensors(note_sequence)
       if not extracted_tensors.inputs:
-        raise NoExtractedExamplesError(
-            'No examples extracted from NoteSequence: %s' % note_sequence)
+         raise NoExtractedExamplesError(
+             'No examples extracted from NoteSequence: %s' % note_sequence)
       if len(extracted_tensors.inputs) > 1:
-        raise MultipleExtractedExamplesError(
-            'Multiple (%d) examples extracted from NoteSequence: %s' %
-            (len(extracted_tensors.inputs), note_sequence))
+         raise MultipleExtractedExamplesError(
+             'Multiple (%d) examples extracted from NoteSequence: %s' %
+             (len(extracted_tensors.inputs), note_sequence))
+        
       inputs.append(extracted_tensors.inputs[0])
       controls.append(extracted_tensors.controls[0])
       lengths.append(extracted_tensors.lengths[0])
       if assert_same_length and len(inputs[0]) != len(inputs[-1]):
-        raise AssertionError(
-            'Sequences 0 and %d have different lengths: %d vs %d' %
-            (len(inputs) - 1, len(inputs[0]), len(inputs[-1])))
+         raise AssertionError(
+             'Sequences 0 and %d have different lengths: %d vs %d' %
+             (len(inputs) - 1, len(inputs[0]), len(inputs[-1])))
     return self.encode_tensors(inputs, lengths, controls)
 
   def encode_tensors(self, input_tensors, lengths, control_tensors=None):

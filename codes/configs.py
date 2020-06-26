@@ -56,7 +56,7 @@ CONFIG_MAP['groovae_2bar_tap_fixed_velocity'] = Config(
         lstm_models.get_default_hparams(),
         HParams(
             batch_size=512,
-            max_seq_len=16 * 2,  # 2 bars w/ 16 steps per bar
+            max_seq_len=16 * 2,  
             z_size=256,
             enc_rnn_size=[512],
             dec_rnn_size=[256, 256],
@@ -67,8 +67,8 @@ CONFIG_MAP['groovae_2bar_tap_fixed_velocity'] = Config(
     note_sequence_augmenter=None,
     data_converter=data.GrooveConverter(
         split_bars=2, steps_per_quarter=4, quarters_per_bar=4,
-        max_tensors_per_notesequence=20, tapify=True,fixed_offsets=False,
-        fixed_velocities=True, pitch_classes=data.ROLAND_DRUM_PITCH_CLASSES,
+        max_tensors_per_notesequence=20, tapify=True,fixed_velocities=True,
+        pitch_classes=data.ROLAND_DRUM_PITCH_CLASSES,
         inference_pitch_classes=data.REDUCED_DRUM_PITCH_CLASSES),
     tfds_name='groove/2bar-midionly'
 )
